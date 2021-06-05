@@ -37,7 +37,7 @@ def part_of_experiment(n_trials, exp, fix):
 window = visual.Window(units="pix", color="gray", fullscr=False)
 window.setMouseVisible(False)
 
-clock = core.Clock() qpq q pqp q o  pq woeucn
+clock = core.Clock()
 
 stim = {"left": visual.TextStim(win=window, text="LEWO", height=80, pos=(-500, 0.0)),
         "right": visual.TextStim(win=window, text="PRAWO", height=80, pos=(500, 0.0))}
