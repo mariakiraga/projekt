@@ -4,9 +4,9 @@ import csv
 
 N_TRIALS_TRAIN = 1
 N_TRAILS_EXP = 4
-REACTION_KEYS = ['left', 'right']
-RESULTS = [["NR", "EXPERIMENT", "ACC", "RT", "TRIAL_TYPE", "REACTION"]]
-
+REACTION_KEYS = ['q', 'p']
+RESULTS = [["TRIAL", "TRAINING", "TRIAL_TYPE", "REACTION", "CORRECT", "CONGRUENT","LATENCY"]]
+#"ID","SEX","AGE",
 
 def reactions(keys):
     event.clearEvents()
@@ -20,42 +20,60 @@ def show_text(win, info, wait_key=["space"]):
     reactions(wait_key)
 
 
-def part_of_experiment(n_trials, exp, fix):
+def part_of_experiment(n_trials, train, fix, time):
     for i in range(n_trials):
         stim_type = random.choice(list(stim.keys()))
-        stim[stim_type].setAutoDraw(True)
+
+        #fix point
+        fix.setAutoDraw(True)
+        window.flip()
+        core.wait(1)
+
         window.callOnFlip(clock.reset)
+        stim[stim_type].setAutoDraw(True)
         window.flip()
         key = reactions(REACTION_KEYS)
-        rt = clock.getTime()
+
         stim[stim_type].setAutoDraw(False)
+        fix.setAutoDraw(False)
         window.flip()
-        acc = stim_type == key
-        RESULTS.append([i+1, exp, acc, rt, stim_type, key])
+        core.wait(time)
+
+        rt = clock.getTime()
+        con = stim_type == key
+
+        for stim_type in ["left_com", "left_incom"]:
+            corr = 1
+            print(corr)
 
 
-window = visual.Window(units="pix", color="gray", fullscr=False)
+        RESULTS.append([i+1, train, corr, con, rt])
+
+
+window = visual.Window(units="pix", color="gray", fullscr=False, size=(1500, 1500))
 window.setMouseVisible(False)
 
-clock = core.Clock() qpq q pqp q o  pq woeucn
+clock = core.Clock()
 
-stim = {"left": visual.TextStim(win=window, text="LEWO", height=80, pos=(-500, 0.0)),
-        "right": visual.TextStim(win=window, text="PRAWO", height=80, pos=(500, 0.0))}
+stim = {"left_com": visual.TextStim(win=window, text="LEWO", color="red", pos=(-500.0, 0.0), height=80),
+        "left_incom": visual.TextStim(win=window, text="LEWO", color="red", pos=(500.0,0.0), height=80),
+        "right_com": visual.TextStim(win=window, text="PRAWO", color="red", pos=(500.0,0.0), height=80),
+        "right_incom": visual.TextStim(win=window, text="PRAWO", color="red", pos=(-500.0, 0.0), height=80)}
 
-fix = visual.TextStim(win=window, text="+", height=40)
+fix = visual.TextStim(win=window, text="+", color="black", height=60)
 
-inst1 = visual.TextStim(win=window, text="instrukcja", height=20)
-inst2 = visual.TextStim(win=window, text="teraz eksperyment", height=20)
-inst_end = visual.TextStim(win=window, text="koniec", height=20)
+inst1 = visual.TextStim(win=window, text="instrukcja", color="white", height=40)
+inst2 = visual.TextStim(win=window, text="teraz eksperyment", color="white", height=40)
+inst_end = visual.TextStim(win=window, text="koniec", color="white", height=40)
 
 
 # TRAINING
 show_text(win=window, info=inst1)
-part_of_experiment(N_TRIALS_TRAIN, exp=False, fix=fix)
+part_of_experiment(N_TRIALS_TRAIN, train=True, fix=fix, time=1)
 
 # EXPERIMENT
 show_text(win=window, info=inst2)
-part_of_experiment(N_TRAILS_EXP, exp=True, fix=fix)
+part_of_experiment(N_TRAILS_EXP, train=False, fix=fix, time=1)
 
 # THE END
 show_text(win=window, info=inst_end)
@@ -63,5 +81,8 @@ show_text(win=window, info=inst_end)
 with open("result.csv", "w", newline='') as f:
     write = csv.writer(f)
     write.writerows(RESULTS)
+
+
+
 
 
