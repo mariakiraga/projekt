@@ -1,5 +1,5 @@
-#from psychopy import visual, core, event
-#import random
+from psychopy import visual, core, event
+import random
 import csv
 
 N_TRIALS_TRAIN = 1
