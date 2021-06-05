@@ -34,10 +34,10 @@ def part_of_experiment(n_trials, exp, fix):
         RESULTS.append([i+1, exp, acc, rt, stim_type, key])
 
 
-window = visual.Window(units="pix", color="gray", fullscr=True)
+window = visual.Window(units="pix", color="gray", fullscr=False)
 window.setMouseVisible(False)
 
-clock = core.Clock()
+clock = core.Clock() qpq q pqp q o  pq woeucn
 
 stim = {"left": visual.TextStim(win=window, text="LEWO", height=80, pos=(-500, 0.0)),
         "right": visual.TextStim(win=window, text="PRAWO", height=80, pos=(500, 0.0))}
