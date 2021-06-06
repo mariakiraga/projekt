@@ -40,11 +40,27 @@ def part_of_experiment(n_trials, train, fix, time):
         core.wait(time)
 
         rt = clock.getTime()
-        con = stim_type == key
-
-        for stim_type in ["left_com", "left_incom"]:
+        # corr = poprawność
+        if stim_type == "left_com" and key == "q":
             corr = 1
-            print(corr)
+        elif stim_type == "left_incom" and key == "q":
+            corr = 1
+        elif stim_type == "right_com" and key == "p":
+            corr = 1
+        elif stim_type == "right_com" and key == "p":
+            corr = 1
+        else:
+            corr = 0
+
+        # con = zgodnosc
+        if stim_type == "left_com":
+            con = 1
+        elif stim_type == "right_com":
+            con = 1
+        elif stim_type == "left_incom":
+            con = 0
+        elif stim_type == "right_incom":
+            con = 0
 
 
         RESULTS.append([i+1, train, corr, con, rt])
