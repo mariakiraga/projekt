@@ -19,6 +19,10 @@ def show_text(win, info, wait_key=["space"]):
     win.flip()
     reactions(wait_key)
 
+def show_text_pop(win, info):
+    info.draw()
+    win.flip()
+    core.wait(0.5)
 
 def part_of_experiment(n_trials, train, fix, time):
     for i in range(n_trials):
@@ -38,6 +42,19 @@ def part_of_experiment(n_trials, train, fix, time):
         fix.setAutoDraw(False)
         window.flip()
         core.wait(time)
+
+        #odpowiedz zwrotna w treningu
+        if train == True:
+            if stim_type == "left_com" and key == "q":
+                show_text_pop(win=window, info=popr)
+            elif stim_type == "left_incom" and key == "q":
+                show_text_pop(win=window, info=popr)
+            elif stim_type == "right_com" and key == "p":
+                show_text_pop(win=window, info=popr)
+            elif stim_type == "right_com" and key == "p":
+                show_text_pop(win=window, info=popr)
+            else:
+                show_text_pop(win=window, info=niepopr)
 
         rt = clock.getTime()
         # corr = poprawność
@@ -66,7 +83,7 @@ def part_of_experiment(n_trials, train, fix, time):
         RESULTS.append([i+1, train, corr, con, rt])
 
 
-window = visual.Window(units="pix", color="gray", fullscr=False, size=(1500, 1500))
+window = visual.Window(units="pix", color="gray", fullscr=False, size=(1500, 1500) )
 window.setMouseVisible(False)
 
 clock = core.Clock()
@@ -81,7 +98,8 @@ fix = visual.TextStim(win=window, text="+", color="black", height=60)
 inst1 = visual.TextStim(win=window, text="instrukcja", color="white", height=40)
 inst2 = visual.TextStim(win=window, text="teraz eksperyment", color="white", height=40)
 inst_end = visual.TextStim(win=window, text="koniec", color="white", height=40)
-
+popr = visual.TextStim(win=window, text="Poprawnie :)", color="white", height=40)
+niepopr = visual.TextStim(win=window, text="Niepoprawnie :(", color="white", height=40)
 
 # TRAINING
 show_text(win=window, info=inst1)
