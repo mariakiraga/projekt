@@ -6,7 +6,7 @@ N_TRIALS_TRAIN = 1
 N_TRAILS_EXP = 4
 REACTION_KEYS = ['q', 'p']
 RESULTS = [["TRIAL", "TRAINING", "TRIAL_TYPE", "REACTION", "CORRECT", "CONGRUENT","LATENCY"]]
-#"ID","SEX","AGE",
+#"ID","SEX","AGE", -
 
 def reactions(keys):
     event.clearEvents()
