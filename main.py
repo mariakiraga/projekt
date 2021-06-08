@@ -83,7 +83,7 @@ def part_of_experiment(n_trials, train, fix, time):
         RESULTS.append([i+1, train, corr, con, rt])
 
 
-window = visual.Window(units="pix", color="gray", fullscr=False, size=(1500, 1500) )
+window = visual.Window(units="pix", color="gray", fullscr=False, size=(1500, 1500))
 window.setMouseVisible(False)
 
 clock = core.Clock()

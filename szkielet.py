@@ -130,16 +130,14 @@ def main():
 
     #Stimulus
     stim = {"left_com": visual.TextStim(win=window, text="LEWO", height=conf['STIM_SIZE'],
-                                        color=conf['STIM_COLOR'] pos = conf['STIM_POS_L']),
-    "left_incom": visual.TextStim(win=window, text="LEWO", height=conf['STIM_SIZE'],
-                                  color=conf['STIM_COLOR']
-    pos = conf['STIM_POS_R']),
-    "right_com": visual.TextStim(win=window, text="PRAWO", height=conf['STIM_SIZE'],
-                                 color=conf['STIM_COLOR']
-    pos = conf['STIM_POS_R']),
-    "right_incom": visual.TextStim(win=window, text="PRAWO", height=conf['STIM_SIZE'],
-                                   color=conf['STIM_COLOR']
-    pos = conf['STIM_POS_L'])}
+                                        color=conf['STIM_COLOR'], pos = conf['STIM_POS_L']),
+        "left_incom": visual.TextStim(win=window, text="LEWO", height=conf['STIM_SIZE'],
+                                  color=conf['STIM_COLOR'], pos = conf['STIM_POS_R']),
+        "right_com": visual.TextStim(win=window, text="PRAWO", height=conf['STIM_SIZE'],
+                                     color=conf['STIM_COLOR'], pos = conf['STIM_POS_R']),
+        "right_incom": visual.TextStim(win=window, text="PRAWO", height=conf['STIM_SIZE'],
+                                   color=conf['STIM_COLOR'], pos = conf['STIM_POS_L'])}
+
     fix = visual.TextStim(win, text='+', height=60, color=conf['FIX_CROSS_COLOR'])
 
     # === Training ===
