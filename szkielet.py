@@ -84,6 +84,10 @@ def abort_with_error(err):
     logging.critical(err)
     raise Exception(err)
 
+def reactions():
+    key = event.waitKeys(keyList=keys,timeStamped=clock)
+    return key[0]
+
 
 # GLOBALS
 
@@ -129,13 +133,13 @@ def main():
     logging.info('SCREEN RES: {}'.format(SCREEN_RES.values()))
 
     #Stimulus
-    stim = {"left_com": visual.TextStim(win=window, text="LEWO", height=conf['STIM_SIZE'],
+    stim = {"left_com": visual.TextStim(win=win, text="LEWO", height=conf['STIM_SIZE'],
                                         color=conf['STIM_COLOR'], pos = conf['STIM_POS_L']),
-        "left_incom": visual.TextStim(win=window, text="LEWO", height=conf['STIM_SIZE'],
+        "left_incom": visual.TextStim(win=win, text="LEWO", height=conf['STIM_SIZE'],
                                   color=conf['STIM_COLOR'], pos = conf['STIM_POS_R']),
-        "right_com": visual.TextStim(win=window, text="PRAWO", height=conf['STIM_SIZE'],
+        "right_com": visual.TextStim(win=win, text="PRAWO", height=conf['STIM_SIZE'],
                                      color=conf['STIM_COLOR'], pos = conf['STIM_POS_R']),
-        "right_incom": visual.TextStim(win=window, text="PRAWO", height=conf['STIM_SIZE'],
+        "right_incom": visual.TextStim(win=win, text="PRAWO", height=conf['STIM_SIZE'],
                                    color=conf['STIM_COLOR'], pos = conf['STIM_POS_L'])}
 
     fix = visual.TextStim(win, text='+', height=60, color=conf['FIX_CROSS_COLOR'])
@@ -184,28 +188,56 @@ def run_trial(win, ...):
     Should be prepared outside this function and passed for .draw() or .setAutoDraw().
     All behavioral data (reaction time, answer, etc. should be returned from this function)
     """
-
     # === Prepare trial-related stimulus ===
-    # Randomise if needed
-    #
-    # Examples:
-    #
-    # que_pos = random.choice([-conf['STIM_SHIFT'], conf['STIM_SHIFT']])
-    # stim.text = random.choice(conf['STIM_LETTERS'])
-    #
+    stim_type = random.choice(list(conf['REACTION_KEYS'].keys()))
+
 
     # === Start pre-trial  stuff (Fixation cross etc.)===
-
-    # for _ in range(conf['FIX_CROSS_TIME']):
-    #    fix_cross.draw()
-    #    win.flip()
+    # fix point
+    fix.setAutoDraw(True)
+    win.flip()
+    core.wait(conf['FIX_CROSS_TIME'])
 
     # === Start trial ===
-    # This part is time-crucial. All stims must be already prepared.
-    # Only .draw() .flip() and reaction related stuff goes there.
     event.clearEvents()
-    # make sure, that clock will be reset exactly when stimuli will be drawn
     win.callOnFlip(clock.reset)
+
+    stim[stim_type].setAutoDraw(True)
+    win.flip()
+    key = reactions(REACTION_KEYS)
+
+    stim[stim_type].setAutoDraw(False)
+    fix.setAutoDraw(False)
+    win.flip()
+    core.wait(conf['STIM_BREAK'])
+
+    trial_no += 1
+    rt = clock.getTime()
+    # corr = poprawno??
+    if stim_type == "left_com" and key == "q":
+        corr = 1
+    elif stim_type == "left_incom" and key == "q":
+        corr = 1
+    elif stim_type == "right_com" and key == "p":
+        corr = 1
+    elif stim_type == "right_com" and key == "p":
+        corr = 1
+    else:
+        corr = 0
+
+    # con = zgodnosc
+    if stim_type == "left_com":
+        con = 1
+    elif stim_type == "right_com":
+        con = 1
+    elif stim_type == "left_incom":
+        con = 0
+    elif stim_type == "right_incom":
+        con = 0
+
+    RESULTS.append([trial_no, train, corr, con, rt])
+
+
 
     for _ in range(conf['STIM_TIME']):  # present stimuli
         reaction=event.getKeys(keyList=list(
