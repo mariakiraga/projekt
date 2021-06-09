@@ -13,6 +13,8 @@ from psychopy import visual, event, logging, gui, core
 from misc.screen_misc import get_screen_res, get_frame_rate
 from itertools import combinations_with_replacement, product
 
+from main import stim, fix
+
 
 @atexit.register
 def save_beh_results():
@@ -97,6 +99,7 @@ RESULTS.append(['PART_ID', "TRIAL", "TRAINING", "TRIAL_TYPE", "REACTION", "CORRE
 
 def main():
     global PART_ID  # PART_ID is used in case of error on @atexit, that's why it must be global
+    , corr
 
     # === Dialog popup ===
     info={'IDENTYFIKATOR': '', u'P\u0141EC': ['M', "K"], 'WIEK': '20'}
@@ -151,11 +154,15 @@ def main():
     trial_no += 1
 
     show_info(win, join('.', 'messages', 'before_training.txt'))
-    csi_list=[conf['TRAINING_CSI']] * conf['NO_TRAINING_TRIALS'][1]
-    for csi in csi_list:
-        key_pressed, rt, ...=run_trial(win, conf, ...)
-        corr=...# to raczej w funkcji trialu
-        RESULTS.append([PART_ID, trial_no, 'training', ...])
+    #csi_list=[conf['TRAINING_CSI']] * conf['NO_TRAINING_TRIALS'][1]
+    #for csi in csi_list:
+     #   corr, con, rt = run_trial(win, conf)
+
+    for block_no in range(conf['NO_BLOCKS_TRAIN']):
+        for a in range(conf['N_TRAILS_TRAIN']):
+            trial_no=a
+            corr, con, rt = run_trial(win, conf)
+        RESULTS.append([PART_ID, block_no, trial_no, 1, corr, con, rt]) #1-trening
 
         win.flip()
 
@@ -164,14 +171,27 @@ def main():
 
     show_info(win, join('.', 'messages', 'before_experiment.txt'))
 
-    for block_no in range(conf['NO_BLOCKS']):
-        for _ in range(conf['Trials in block'])
-            key_pressed, rt, ...=run_trial(win, conf, ...)
-            RESULTS.append([PART_ID, block_no, trial_no, 'experiment', ...])
+    for block_no in range(conf['NO_BLOCKS_EXP']):
+        for i in range(conf['N_TRAILS_EXP']):
+            trial_no = i
+            corr, con, rt = run_trial(win, conf)
+            RESULTS.append([PART_ID, block_no, trial_no, 0 , corr, con, rt]) #0 - eksperyment
             trial_no += 1
 
         show_image(win, os.path.join('.', 'images', 'break.jpg'), # zamiast tego show info o przerwie + 30s do spacji funkcja
                    size=(SCREEN_RES['width'], SCREEN_RES['height']))
+
+        win.flip()
+        core.wait(conf['TIME_FOR_REAST'])
+# co? z tym 30s
+    for _ in range():  # present stimuli
+        reaction = event.getKeys(keyList=list(
+            conf['REACTION_KEYS']), timeStamped=clock)
+        if reaction:  # break if any button was pressed
+            break
+        win.flip()
+
+
 
         # === Cleaning time ===
     save_beh_results()
@@ -180,7 +200,7 @@ def main():
     win.close()
     core.quit()
 
-def run_trial(win, ...):
+def run_trial(win, conf):
     """
     Prepare and present single trial of procedure.
     Input (params) should consist all data need for presenting stimuli.
@@ -189,7 +209,8 @@ def run_trial(win, ...):
     All behavioral data (reaction time, answer, etc. should be returned from this function)
     """
     # === Prepare trial-related stimulus ===
-    stim_type = random.choice(list(conf['REACTION_KEYS'].keys()))
+    global con
+    stim_type = random.choice(list(stim.keys()))
 
 
     # === Start pre-trial  stuff (Fixation cross etc.)===
@@ -204,14 +225,14 @@ def run_trial(win, ...):
 
     stim[stim_type].setAutoDraw(True)
     win.flip()
-    key = reactions(REACTION_KEYS)
+    key = reactions()
 
     stim[stim_type].setAutoDraw(False)
     fix.setAutoDraw(False)
     win.flip()
-    core.wait(conf['STIM_BREAK'])
+    core.wait(random.randrange(conf['STIM_BREAK']))
 
-    trial_no += 1
+
     rt = clock.getTime()
     # corr = poprawno??
     if stim_type == "left_com" and key == "q":
@@ -235,19 +256,11 @@ def run_trial(win, ...):
     elif stim_type == "right_incom":
         con = 0
 
-    RESULTS.append([trial_no, train, corr, con, rt])
+    return corr, con, rt
+# trening/ eksperyment dodaje si? w main
 
 
-
-    for _ in range(conf['STIM_TIME']):  # present stimuli
-        reaction=event.getKeys(keyList=list(
-            conf['REACTION_KEYS']), timeStamped=clock)
-        if reaction:  # break if any button was pressed
-            break
-        stim.draw()
-        win.flip()
-
-    if not reaction:  # no reaction during stim time, allow to answer after that
+    '''if not reaction:  # no reaction during stim time, allow to answer after that
         question_frame.draw()
         question_label.draw()
         win.flip()
@@ -258,9 +271,9 @@ def run_trial(win, ...):
         key_pressed, rt=reaction[0]
     else:  # timeout
         key_pressed='no_key'
-        rt=-1.0
+        rt=-1.0'''
 
-    return key_pressed, rt  # return all data collected during trial
+
 
 if __name__ == '__main__':
     PART_ID=''

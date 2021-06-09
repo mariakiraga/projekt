@@ -1,10 +1,10 @@
 # All values in no of frames
 BACKGROUND_COLOR: gray
 FRAME_RATE: 60
-FIX_CROSS_TIME: 30  #czas miedzy + a bodźcem
+
 NO_TRAINING_TRIALS: [5, 1]
 INTRA_BLOCK_TRAINIG: 2
-NO_BLOCKS: 1
+NO_BLOCKS: 2
 TRAINING_CSI: 10
 FIX_CROSS_COLOR: black
 QUE_COLOR: darkred
@@ -15,10 +15,31 @@ QUE_SHIFT: 40
 STIM_LETTERS: ←→↑↓
 STIM_SIZE: 25
 STIM_SHIFT: 600
-STIM_BREAK: 15 #czas prezentacji bodźca
+
 REACTION_TIME: 90
 MASK_TIME: 10
-REACTION_KEYS: [q,p]
+REACTION_KEYS: ['q','p']
 REACTION_KEYS_SEP: 30
 CSI_BAND: [13, 18]
 STIM_COLOR: dimgray
+
+# All values in no of frames
+BACKGROUND_COLOR: gray
+NO_BLOCK_TRAIN: 1  #ilość bloków tren.
+NO_BLOCK_EXP: 2  #ilość bloków eksp.
+FRAME_RATE: 60
+N_TRIALS_TRAIN: 1
+N_TRAILS_EXP: 30 #ilość powtórzeń w bloku
+REACTION_KEYS: ["space", 'q', 'p']
+RESULTS: [["TRIAL", "TRAINING", "TRIAL_TYPE", "REACTION", "CORRECT", "CONGRUENT","LATENCY"]]
+TIME_BREAK: 1
+TIME_FOR_REAST: 30
+FIX_CROSS_TIME: 30  #czas miedzy + a bodźcem
+
+FIX_CROSS_COLOR: black
+STIM_SIZE: 80
+STIM_TIME: 240
+STIM_POS_L: (-500.0, 0.0)
+STIM_POS_R: (500.0, 0.0)
+STIM_COLOR: red
+STIM_BREAK: [30,100] #przedział do losowania czasu miedzy prezentacją bodźca, a nowym bodźcem
