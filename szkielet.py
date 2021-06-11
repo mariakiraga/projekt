@@ -99,7 +99,7 @@ RESULTS.append(['PART_ID', "TRIAL", "TRAINING", "TRIAL_TYPE", "REACTION", "CORRE
 
 def main():
     global PART_ID  # PART_ID is used in case of error on @atexit, that's why it must be global
-    , corr
+
 
     # === Dialog popup ===
     info={'IDENTYFIKATOR': '', u'P\u0141EC': ['M', "K"], 'WIEK': '20'}
