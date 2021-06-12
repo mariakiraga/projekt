@@ -91,6 +91,7 @@ def reactions():
     return key[0]
 
 
+
 # GLOBALS
 
 RESULTS = list()  # list in which data will be colected
@@ -151,6 +152,7 @@ def main():
 
     show_info(win, join('.', 'messages', 'hello.txt'))
 
+
     trial_no += 1
 
     show_info(win, join('.', 'messages', 'before_training.txt'))
@@ -161,7 +163,7 @@ def main():
     for block_no in range(conf['NO_BLOCKS_TRAIN']):
         for a in range(conf['N_TRAILS_TRAIN']):
             trial_no=a
-            corr, con, rt = run_trial(win, conf)
+            corr, con, rt = run_trial(win, conf, conf['N_TRIALS_TRAIN'])
         RESULTS.append([PART_ID, block_no, trial_no, 1, corr, con, rt]) #1-trening
 
         win.flip()
@@ -174,7 +176,7 @@ def main():
     for block_no in range(conf['NO_BLOCKS_EXP']):
         for i in range(conf['N_TRAILS_EXP']):
             trial_no = i
-            corr, con, rt = run_trial(win, conf)
+            corr, con, rt = run_trial(win, conf, conf['N_TRIALS_EXP'])
             RESULTS.append([PART_ID, block_no, trial_no, 0 , corr, con, rt]) #0 - eksperyment
             trial_no += 1
 
@@ -200,7 +202,7 @@ def main():
     win.close()
     core.quit()
 
-def run_trial(win, conf):
+def run_trial(win, conf, n_trials):
     """
     Prepare and present single trial of procedure.
     Input (params) should consist all data need for presenting stimuli.
@@ -210,8 +212,13 @@ def run_trial(win, conf):
     """
     # === Prepare trial-related stimulus ===
     global con
-    stim_type = random.choice(list(stim.keys()))
 
+    previous_stim_type = ""
+    for i in range(n_trials):
+        stim_type = random.choice(list(stim.keys()))
+        while stim_type == previous_stim_type:
+            stim_type = random.choice(list(stim.keys()))
+        previous_stim_type = stim_type
 
     # === Start pre-trial  stuff (Fixation cross etc.)===
     # fix point
