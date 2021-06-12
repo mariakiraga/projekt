@@ -24,9 +24,16 @@ def show_text_pop(win, info):
     win.flip()
     core.wait(0.5)
 
+
+
+
 def part_of_experiment(n_trials, train, fix, time):
+    previous_stim_type = ""
     for i in range(n_trials):
         stim_type = random.choice(list(stim.keys()))
+        while stim_type == previous_stim_type:
+            stim_type = random.choice(list(stim.keys()))
+        previous_stim_type = stim_type
 
         #fix point
         fix.setAutoDraw(True)
