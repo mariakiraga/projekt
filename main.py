@@ -6,7 +6,7 @@ N_TRIALS_TRAIN = 1
 N_TRAILS_EXP = 4
 REACTION_KEYS = ['q', 'p']
 RESULTS = [["TRIAL", "TRAINING", "TRIAL_TYPE", "REACTION", "CORRECT", "CONGRUENT","LATENCY"]]
-#"ID","SEX","AGE",
+#"ID","SEX","AGE", -
 
 def reactions(keys):
     event.clearEvents()
@@ -19,10 +19,21 @@ def show_text(win, info, wait_key=["space"]):
     win.flip()
     reactions(wait_key)
 
+def show_text_pop(win, info):
+    info.draw()
+    win.flip()
+    core.wait(0.5)
+
+
+
 
 def part_of_experiment(n_trials, train, fix, time):
+    previous_stim_type = ""
     for i in range(n_trials):
         stim_type = random.choice(list(stim.keys()))
+        while stim_type == previous_stim_type:
+            stim_type = random.choice(list(stim.keys()))
+        previous_stim_type = stim_type
 
         #fix point
         fix.setAutoDraw(True)
@@ -39,12 +50,41 @@ def part_of_experiment(n_trials, train, fix, time):
         window.flip()
         core.wait(time)
 
-        rt = clock.getTime()
-        con = stim_type == key
+        #odpowiedz zwrotna w treningu
+        if train == True:
+            if stim_type == "left_com" and key == "q":
+                show_text_pop(win=window, info=popr)
+            elif stim_type == "left_incom" and key == "q":
+                show_text_pop(win=window, info=popr)
+            elif stim_type == "right_com" and key == "p":
+                show_text_pop(win=window, info=popr)
+            elif stim_type == "right_com" and key == "p":
+                show_text_pop(win=window, info=popr)
+            else:
+                show_text_pop(win=window, info=niepopr)
 
-        for stim_type in ["left_com", "left_incom"]:
+        rt = clock.getTime()
+        # corr = poprawność
+        if stim_type == "left_com" and key == "q":
             corr = 1
-            print(corr)
+        elif stim_type == "left_incom" and key == "q":
+            corr = 1
+        elif stim_type == "right_com" and key == "p":
+            corr = 1
+        elif stim_type == "right_com" and key == "p":
+            corr = 1
+        else:
+            corr = 0
+
+        # con = zgodnosc
+        if stim_type == "left_com":
+            con = 1
+        elif stim_type == "right_com":
+            con = 1
+        elif stim_type == "left_incom":
+            con = 0
+        elif stim_type == "right_incom":
+            con = 0
 
 
         RESULTS.append([i+1, train, corr, con, rt])
@@ -65,7 +105,8 @@ fix = visual.TextStim(win=window, text="+", color="black", height=60)
 inst1 = visual.TextStim(win=window, text="instrukcja", color="white", height=40)
 inst2 = visual.TextStim(win=window, text="teraz eksperyment", color="white", height=40)
 inst_end = visual.TextStim(win=window, text="koniec", color="white", height=40)
-
+popr = visual.TextStim(win=window, text="Poprawnie :)", color="white", height=40)
+niepopr = visual.TextStim(win=window, text="Niepoprawnie :(", color="white", height=40)
 
 # TRAINING
 show_text(win=window, info=inst1)

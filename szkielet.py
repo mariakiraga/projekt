@@ -13,6 +13,8 @@ from psychopy import visual, event, logging, gui, core
 from misc.screen_misc import get_screen_res, get_frame_rate
 from itertools import combinations_with_replacement, product
 
+from main import stim, fix
+
 
 @atexit.register
 def save_beh_results():
@@ -84,6 +86,11 @@ def abort_with_error(err):
     logging.critical(err)
     raise Exception(err)
 
+def reactions():
+    key = event.waitKeys(keyList=keys,timeStamped=clock)
+    return key[0]
+
+
 
 # GLOBALS
 
@@ -93,6 +100,7 @@ RESULTS.append(['PART_ID', "TRIAL", "TRAINING", "TRIAL_TYPE", "REACTION", "CORRE
 
 def main():
     global PART_ID  # PART_ID is used in case of error on @atexit, that's why it must be global
+
 
     # === Dialog popup ===
     info={'IDENTYFIKATOR': '', u'P\u0141EC': ['M', "K"], 'WIEK': '20'}
@@ -129,31 +137,34 @@ def main():
     logging.info('SCREEN RES: {}'.format(SCREEN_RES.values()))
 
     #Stimulus
-    stim = {"left_com": visual.TextStim(win=window, text="LEWO", height=conf['STIM_SIZE'],
-                                        color=conf['STIM_COLOR'] pos = conf['STIM_POS_L']),
-    "left_incom": visual.TextStim(win=window, text="LEWO", height=conf['STIM_SIZE'],
-                                  color=conf['STIM_COLOR']
-    pos = conf['STIM_POS_R']),
-    "right_com": visual.TextStim(win=window, text="PRAWO", height=conf['STIM_SIZE'],
-                                 color=conf['STIM_COLOR']
-    pos = conf['STIM_POS_R']),
-    "right_incom": visual.TextStim(win=window, text="PRAWO", height=conf['STIM_SIZE'],
-                                   color=conf['STIM_COLOR']
-    pos = conf['STIM_POS_L'])}
+    stim = {"left_com": visual.TextStim(win=win, text="LEWO", height=conf['STIM_SIZE'],
+                                        color=conf['STIM_COLOR'], pos = conf['STIM_POS_L']),
+        "left_incom": visual.TextStim(win=win, text="LEWO", height=conf['STIM_SIZE'],
+                                  color=conf['STIM_COLOR'], pos = conf['STIM_POS_R']),
+        "right_com": visual.TextStim(win=win, text="PRAWO", height=conf['STIM_SIZE'],
+                                     color=conf['STIM_COLOR'], pos = conf['STIM_POS_R']),
+        "right_incom": visual.TextStim(win=win, text="PRAWO", height=conf['STIM_SIZE'],
+                                   color=conf['STIM_COLOR'], pos = conf['STIM_POS_L'])}
+
     fix = visual.TextStim(win, text='+', height=60, color=conf['FIX_CROSS_COLOR'])
 
     # === Training ===
 
     show_info(win, join('.', 'messages', 'hello.txt'))
 
+
     trial_no += 1
 
     show_info(win, join('.', 'messages', 'before_training.txt'))
-    csi_list=[conf['TRAINING_CSI']] * conf['NO_TRAINING_TRIALS'][1]
-    for csi in csi_list:
-        key_pressed, rt, ...=run_trial(win, conf, ...)
-        corr=...# to raczej w funkcji trialu
-        RESULTS.append([PART_ID, trial_no, 'training', ...])
+    #csi_list=[conf['TRAINING_CSI']] * conf['NO_TRAINING_TRIALS'][1]
+    #for csi in csi_list:
+     #   corr, con, rt = run_trial(win, conf)
+
+    for block_no in range(conf['NO_BLOCKS_TRAIN']):
+        for a in range(conf['N_TRAILS_TRAIN']):
+            trial_no=a
+            corr, con, rt = run_trial(win, conf, conf['N_TRIALS_TRAIN'])
+        RESULTS.append([PART_ID, block_no, trial_no, 1, corr, con, rt]) #1-trening
 
         win.flip()
 
@@ -162,14 +173,27 @@ def main():
 
     show_info(win, join('.', 'messages', 'before_experiment.txt'))
 
-    for block_no in range(conf['NO_BLOCKS']):
-        for _ in range(conf['Trials in block'])
-            key_pressed, rt, ...=run_trial(win, conf, ...)
-            RESULTS.append([PART_ID, block_no, trial_no, 'experiment', ...])
+    for block_no in range(conf['NO_BLOCKS_EXP']):
+        for i in range(conf['N_TRAILS_EXP']):
+            trial_no = i
+            corr, con, rt = run_trial(win, conf, conf['N_TRIALS_EXP'])
+            RESULTS.append([PART_ID, block_no, trial_no, 0 , corr, con, rt]) #0 - eksperyment
             trial_no += 1
 
         show_image(win, os.path.join('.', 'images', 'break.jpg'), # zamiast tego show info o przerwie + 30s do spacji funkcja
                    size=(SCREEN_RES['width'], SCREEN_RES['height']))
+
+        win.flip()
+        core.wait(conf['TIME_FOR_REAST'])
+# co? z tym 30s
+    for _ in range():  # present stimuli
+        reaction = event.getKeys(keyList=list(
+            conf['REACTION_KEYS']), timeStamped=clock)
+        if reaction:  # break if any button was pressed
+            break
+        win.flip()
+
+
 
         # === Cleaning time ===
     save_beh_results()
@@ -178,7 +202,7 @@ def main():
     win.close()
     core.quit()
 
-def run_trial(win, ...):
+def run_trial(win, conf, n_trials):
     """
     Prepare and present single trial of procedure.
     Input (params) should consist all data need for presenting stimuli.
@@ -186,38 +210,64 @@ def run_trial(win, ...):
     Should be prepared outside this function and passed for .draw() or .setAutoDraw().
     All behavioral data (reaction time, answer, etc. should be returned from this function)
     """
-
     # === Prepare trial-related stimulus ===
-    # Randomise if needed
-    #
-    # Examples:
-    #
-    # que_pos = random.choice([-conf['STIM_SHIFT'], conf['STIM_SHIFT']])
-    # stim.text = random.choice(conf['STIM_LETTERS'])
-    #
+    global con
+
+    previous_stim_type = ""
+    for i in range(n_trials):
+        stim_type = random.choice(list(stim.keys()))
+        while stim_type == previous_stim_type:
+            stim_type = random.choice(list(stim.keys()))
+        previous_stim_type = stim_type
 
     # === Start pre-trial  stuff (Fixation cross etc.)===
-
-    # for _ in range(conf['FIX_CROSS_TIME']):
-    #    fix_cross.draw()
-    #    win.flip()
+    # fix point
+    fix.setAutoDraw(True)
+    win.flip()
+    core.wait(conf['FIX_CROSS_TIME'])
 
     # === Start trial ===
-    # This part is time-crucial. All stims must be already prepared.
-    # Only .draw() .flip() and reaction related stuff goes there.
     event.clearEvents()
-    # make sure, that clock will be reset exactly when stimuli will be drawn
     win.callOnFlip(clock.reset)
 
-    for _ in range(conf['STIM_TIME']):  # present stimuli
-        reaction=event.getKeys(keyList=list(
-            conf['REACTION_KEYS']), timeStamped=clock)
-        if reaction:  # break if any button was pressed
-            break
-        stim.draw()
-        win.flip()
+    stim[stim_type].setAutoDraw(True)
+    win.flip()
+    key = reactions()
 
-    if not reaction:  # no reaction during stim time, allow to answer after that
+    stim[stim_type].setAutoDraw(False)
+    fix.setAutoDraw(False)
+    win.flip()
+    core.wait(random.randrange(conf['STIM_BREAK']))
+
+
+    rt = clock.getTime()
+    # corr = poprawno??
+    if stim_type == "left_com" and key == "q":
+        corr = 1
+    elif stim_type == "left_incom" and key == "q":
+        corr = 1
+    elif stim_type == "right_com" and key == "p":
+        corr = 1
+    elif stim_type == "right_com" and key == "p":
+        corr = 1
+    else:
+        corr = 0
+
+    # con = zgodnosc
+    if stim_type == "left_com":
+        con = 1
+    elif stim_type == "right_com":
+        con = 1
+    elif stim_type == "left_incom":
+        con = 0
+    elif stim_type == "right_incom":
+        con = 0
+
+    return corr, con, rt
+# trening/ eksperyment dodaje si? w main
+
+
+    '''if not reaction:  # no reaction during stim time, allow to answer after that
         question_frame.draw()
         question_label.draw()
         win.flip()
@@ -228,9 +278,11 @@ def run_trial(win, ...):
         key_pressed, rt=reaction[0]
     else:  # timeout
         key_pressed='no_key'
-        rt=-1.0
+        rt=-1.0'''
 
-    return key_pressed, rt  # return all data collected during trial
+
+
+#pytania: 1. czy randomizacja wystarczy do 50/50? 2.
 
 if __name__ == '__main__':
     PART_ID=''
