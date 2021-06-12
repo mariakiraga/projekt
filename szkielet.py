@@ -273,7 +273,7 @@ def run_trial(win, conf):
         key_pressed='no_key'
         rt=-1.0'''
 
-
+#pytania: 1. czy randomizacja wystarczy do 50/50? 2.
 
 if __name__ == '__main__':
     PART_ID=''
