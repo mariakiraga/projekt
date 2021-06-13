@@ -1,23 +1,41 @@
-from psychopy import visual, core, event
+import codecs
 import random
 import csv
+from os.path import join
+
+from psychopy import visual, event, gui, core
 
 N_TRIALS_TRAIN = 1
 N_TRAILS_EXP = 4
 REACTION_KEYS = ['q', 'p']
-RESULTS = [["TRIAL", "TRAINING", "TRIAL_TYPE", "REACTION", "CORRECT", "CONGRUENT","LATENCY"]]
-#"ID","SEX","AGE", -
+RESULTS = [["PART_ID", "TRIAL", "TRAINING", "CORRECT", "CONGRUENT","LATENCY"]]
+
 
 def reactions(keys):
     event.clearEvents()
     key = event.waitKeys(keyList=keys)
     return key[0]
 
+def read_text_from_file(file_name, insert=''):
+    msg = list()
+    with codecs.open(file_name, encoding='utf-8', mode='r') as data_file:
+        for line in data_file:
+            if not line.startswith('#'):  # if not commented line
+                if line.startswith('<--insert-->'):
+                    if insert:
+                        msg.append(insert)
+                else:
+                    msg.append(line)
+    return ''.join(msg)
 
-def show_text(win, info, wait_key=["space"]):
-    info.draw()
+
+def show_info(win, file_name, insert=''):
+    msg = read_text_from_file(file_name, insert=insert)
+    msg = visual.TextStim(win, color='black', text=msg,
+                          height=40)
+    msg.draw()
     win.flip()
-    reactions(wait_key)
+    win.flip()
 
 def show_text_pop(win, info):
     info.draw()
@@ -25,6 +43,10 @@ def show_text_pop(win, info):
     core.wait(0.5)
 
 
+def save_data():
+    with open(join('results', datafile), "w", newline='') as df:
+        write = csv.writer(df)
+        write.writerows(RESULTS)
 
 
 def part_of_experiment(n_trials, train, fix, time):
@@ -90,10 +112,26 @@ def part_of_experiment(n_trials, train, fix, time):
         RESULTS.append([i+1, train, corr, con, rt])
 
 
-window = visual.Window(units="pix", color="gray", fullscr=False, size=(1500, 1500))
-window.setMouseVisible(False)
+
 
 clock = core.Clock()
+
+# VISUAL SETTINGS FOR DIALOG BOX
+window = visual.Window(units="pix", color="gray", fullscr=False, size=(1500, 1500))
+window.setMouseVisible(True)
+
+# DIALOG BOX
+info = {'ID': '', 'PLEC': ['M', 'K'], 'WIEK': ''}
+dlg = gui.DlgFromDict(info, title='Wpisz swoje dane :)')
+if not dlg.OK:
+    print("User exited")
+    core.quit()
+
+ID = info['ID'] + info['PLEC'] + info['WIEK']
+datafile = 'ID.csv'
+
+window = visual.Window(units="pix", color="gray", fullscr=True, size=(1500, 1500))
+window.setMouseVisible(False)
 
 stim = {"left_com": visual.TextStim(win=window, text="LEWO", color="red", pos=(-500.0, 0.0), height=80),
         "left_incom": visual.TextStim(win=window, text="LEWO", color="red", pos=(500.0,0.0), height=80),
@@ -109,19 +147,18 @@ popr = visual.TextStim(win=window, text="Poprawnie :)", color="white", height=40
 niepopr = visual.TextStim(win=window, text="Niepoprawnie :(", color="white", height=40)
 
 # TRAINING
-show_text(win=window, info=inst1)
+show_info(window, join('.', 'messages', 'train_mess.txt'))
 part_of_experiment(N_TRIALS_TRAIN, train=True, fix=fix, time=1)
 
 # EXPERIMENT
-show_text(win=window, info=inst2)
+show_info(window, join('.', 'messages', 'exp_mess.txt'))
 part_of_experiment(N_TRAILS_EXP, train=False, fix=fix, time=1)
 
 # THE END
-show_text(win=window, info=inst_end)
+save_data()
+show_info(window, join('.', 'messages', 'fin_mess.txt'))
+window.close()
 
-with open("result.csv", "w", newline='') as f:
-    write = csv.writer(f)
-    write.writerows(RESULTS)
 
 
 

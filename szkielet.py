@@ -108,7 +108,7 @@ def main():
         abort_with_error('Info dialog terminated.')
 
     clock=core.Clock()
-    # load config, all params are there
+# load config, all params are ther
     conf=yaml.load(open('config.yaml', encoding='utf-8'))
 
     # === Scene init ===
