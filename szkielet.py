@@ -5,22 +5,21 @@ import codecs
 import csv
 import random
 from os.path import join
-from statistics import mean
+#sciagnac srednia ze statystyk
 
 import yaml
 from psychopy import visual, event, logging, gui, core
 
 from misc.screen_misc import get_screen_res, get_frame_rate
-from itertools import combinations_with_replacement, product
+#z itertools zimportowac combinations_with_replacement, product ???
 
 from main import stim, fix
 
 
 @atexit.register
 def save_beh_results():
-    """
-    Save results of experiment. Decorated with @atexit in order to make sure, that intermediate
-    results will be saved even if interpreter will broke.
+    """ Zapisz wybiki eksperymentu. Oznaczone @atexit, aby upewnic sie, ze wyniki posrednie zostana zapisane, nawet
+    jesli interpreter sie zepsuje.
     """
     with open(join('results', PART_ID + '_' + str(random.choice(range(100, 1000))) + '_beh.csv'), 'w', encoding='utf-8') as beh_file:
         beh_writer = csv.writer(beh_file)
@@ -30,11 +29,10 @@ def save_beh_results():
 
 def read_text_from_file(file_name, insert=''):
     """
-    Method that read message from text file, and optionally add some
-    dynamically generated info.
-    :param file_name: Name of file to read
+    Metoda, ktora odczytuje z pliku tekstowego i opcjonalnie dodaje informacje generowane dynamicznie.
+    :param file_name: nazwa pliku do czytania
     :param insert:
-    :return: message
+    :return: wiadomosc
     """
     if not isinstance(file_name, str):
         logging.error('Problem with file reading, filename must be a string')
@@ -53,7 +51,7 @@ def read_text_from_file(file_name, insert=''):
 
 def check_exit(key=chr(27)): #sprawdzic czy dziala
     """
-    Check (during procedure) if experimentator doesn't want to terminate.
+    Sprawdzic (w trakcie procedury) czy eksperymentator nie chce zakonczyc.
     """
     stop = event.getKeys(keyList=[key])
     if stop:
@@ -63,7 +61,7 @@ def check_exit(key=chr(27)): #sprawdzic czy dziala
 
 def show_info(win, file_name, insert=''):
     """
-    Clear way to show info message into screen.
+    Klarowny sposob, aby pokaza polecenia na ekranie.
     :param win:
     :return:
     """
@@ -81,7 +79,7 @@ def show_info(win, file_name, insert=''):
 
 def abort_with_error(err):
     """
-    Call if an error occured.
+    Wywolaj jesli wystapil blad.
     """
     logging.critical(err)
     raise Exception(err)
@@ -99,10 +97,10 @@ RESULTS.append(['PART_ID', "TRIAL", "TRAINING", "TRIAL_TYPE", "REACTION", "CORRE
 # sex,age,id wszystkie poki co sa w part_id, ale czy to tak zostawiac czy nie
 
 def main():
-    global PART_ID  # PART_ID is used in case of error on @atexit, that's why it must be global
+    global PART_ID  # PART_ID jest uzywany w razie, bledu na @atexit, dlatego jest globalny
 
 
-    # === Dialog popup ===
+    # === Okno dialogowe ===
     info={'IDENTYFIKATOR': '', u'P\u0141EC': ['M', "K"], 'WIEK': '20'}
     dictDlg=gui.DlgFromDict(
         dictionary=info, title='Badanie efektu Simona, wpisz swoje imi?!')
