@@ -32,13 +32,6 @@ def show_info(win, file_name, insert=''):
                           height=40)
     msg.draw()
     win.flip()
-    win.flip()
-
-def show_text_pop(win, info):
-    info.draw()
-    win.flip()
-    core.wait(1)  #tu chyba powinno być odniesione do config?
-
 
 def save_data():
     with open(join('results', datafile), "w", newline='') as df:
