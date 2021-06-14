@@ -93,7 +93,7 @@ def reactions():
 # GLOBALS
 
 RESULTS = list()  # list in which data will be colected
-RESULTS.append(['PART_ID', "TRIAL", "TRAINING", "TRIAL_TYPE", "REACTION", "CORRECT", "CONGRUENT","LATENCY"]  # ... Results header
+RESULTS.append(['PART_ID', "TRIAL", "TRAINING", "TRIAL_TYPE", "REACTION", "CORRECT", "CONGRUENT","LATENCY"] ) # ... Results header
 # sex,age,id wszystkie poki co sa w part_id, ale czy to tak zostawiac czy nie
 
 def main():
@@ -161,7 +161,7 @@ def main():
     for block_no in range(conf['NO_BLOCKS_TRAIN']):
         for a in range(conf['N_TRAILS_TRAIN']):
             trial_no=a
-            corr, con, rt = run_trial(win, conf, conf['N_TRIALS_TRAIN'])
+            corr, con, rt = run_trial(win, conf['N_TRIALS_TRAIN'])
         RESULTS.append([PART_ID, block_no, trial_no, 1, corr, con, rt]) #1-trening
 
         win.flip()
