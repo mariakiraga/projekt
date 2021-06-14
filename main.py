@@ -5,7 +5,6 @@ from os.path import join
 
 import yaml
 from psychopy import visual, event, gui, core
-from yaml import FullLoader, BaseLoader
 
 
 def reactions(keys):
@@ -32,6 +31,8 @@ def show_info(win, file_name, insert=''):
                           height=40)
     msg.draw()
     win.flip()
+    event.waitKeys(keyList='space')
+
 
 def save_data():
     with open(join('results', datafile), "w", newline='') as df:
@@ -40,68 +41,76 @@ def save_data():
 
 
 def run_trial(win, n_trials):
+    global r, rt, con
+
     previous_stim_type = ""
     for i in range(n_trials):
         stim_type = random.choice(list(stim.keys()))
         while stim_type == previous_stim_type:
             stim_type = random.choice(list(stim.keys()))
-        previous_stim_type = stim_type
+            previous_stim_type = stim_type
 
         #fix point
-        fix.setAutoDraw(True)
-        win.flip()
-        core.wait(conf['FIX_CROSS_TIME']) #wyświetlanie samego punktu fiksacji
+    fix.setAutoDraw(True)
+    win.flip()
+    core.wait(conf['FIX_CROSS_TIME']) #wyświetlanie samego punktu fiksacji
+
 
         # === Start trial ===
-        event.clearEvents()
-        win.callOnFlip(clock.reset)
+    event.clearEvents()
+    win.callOnFlip(clock.reset)
 
-        stim[stim_type].setAutoDraw(True)
-        win.flip()
-        key = reactions()
+    stim[stim_type].setAutoDraw(True)
+    win.flip()
 
-        stim[stim_type].setAutoDraw(False)
-        fix.setAutoDraw(False)
-        win.flip()
-        core.wait(random.randrange(conf['STIM_BREAK']))
+    r = reactions(conf['REACTION_KEYS'])
+    while True:
+        if r:  # break if any button was pressed
+            rt = clock.getTime()
+            break
 
-        rt = clock.getTime()
+    stim[stim_type].setAutoDraw(False)
+    fix.setAutoDraw(False)
+    win.flip()
+    core.wait(1)
+        #core.wait(random.randrange(conf['STIM_BREAK']))
 
-        # corr = poprawnosc
-        if stim_type == "left_com" and key == "q":
-            corr = 1
-        elif stim_type == "left_incom" and key == "q":
-            corr = 1
-        elif stim_type == "right_com" and key == "p":
-            corr = 1
-        elif stim_type == "right_com" and key == "p":
-            corr = 1
-        else:
-            corr = 0
+    key = r
+    # corr = poprawnosc
+    if stim_type == "left_com" and key == "q":
+        corr = 1
+    elif stim_type == "left_incom" and key == "q":
+        corr = 1
+    elif stim_type == "right_com" and key == "p":
+        corr = 1
+    elif stim_type == "right_com" and key == "p":
+        corr = 1
+    else:
+        corr = 0
 
-        # con = zgodnosc
-        if stim_type == "left_com":
-            con = 1
-        elif stim_type == "right_com":
-            con = 1
-        elif stim_type == "left_incom":
-            con = 0
-        elif stim_type == "right_incom":
-            con = 0
+    # con = zgodnosc
+    if stim_type == "left_com":
+        con = 1
+    elif stim_type == "right_com":
+        con = 1
+    elif stim_type == "left_incom":
+        con = 0
+    elif stim_type == "right_incom":
+        con = 0
 
-        return corr, con, rt
+    return corr, con, rt
 
-RESULTS = list()  # list in which data will be colected
-RESULTS.append(['PART_ID', "TRIAL", "TRAINING", "CORRECT", "CONGRUENT","LATENCY"] ) # ... Results header
 
+
+#main
 clock = core.Clock()
 
-# load config, all params are ther
+# load config, all params are their
 conf=yaml.load(open('config.yaml', encoding='utf-8'))
 
 
 # VISUAL SETTINGS FOR DIALOG BOX
-window = visual.Window(units="pix",color=conf['BACKGROUND_COLOR'], fullscr=False, size=(1500, 1500))
+window = visual.Window(units="pix", color=conf['BACKGROUND_COLOR'], fullscr=False, size=(1500, 1500))
 window.setMouseVisible(True)
 
 # DIALOG BOX
@@ -128,39 +137,34 @@ stim = dict(left_com=visual.TextStim(win=window, text="LEWO", height=conf['STIM_
                                       color=conf['STIM_COLOR'], pos=(500.0, 0.0)),
             right_incom=visual.TextStim(win=window, text="PRAWO", height=conf['STIM_SIZE'],
                                         color=conf['STIM_COLOR'], pos=(-500.0, 0.0)))
-
-#training 
-show_info(window, join('.', 'messages', 'train_mess.txt'))
-
-for block_no in range(conf['NO_BLOCK_TRAIN']):
-    for a in range(conf['N_TRIALS_TRAIN']):
-        trial_no=a
-        trial_no += 1
-        corr, con, rt = run_trial(window, conf['N_TRIALS_TRAIN'])
-        RESULTS.append([ID, block_no, trial_no, 1, corr, con, rt]) #1-trening
-
-    window.flip()
-
-    
-# === Experiment ===
-
+'''  
+# === Experiment part 1 ===
+'''
 show_info(window, join('.', 'messages', 'exp_mess.txt'))
 
 for block_no in range(conf['NO_BLOCK_EXP']):
-    for i in range(conf['N_TRAILS_EXP']):
+    for i in range(conf['N_TRIALS_EXP']):
         trial_no = i
-        corr, con, rt = run_trial(window, conf['N_TRIALS_EXP'])
-        RESULTS.append([ID, block_no, trial_no, 0, corr, con, rt]) #0 - eksperyment
-       
+        run_trial(window, conf['N_TRIALS_EXP'])
+        #corr, con, rt = run_trial(window, conf['N_TRIALS_EXP'])
+        #conf['RESULTS'].append([ID, trial_no, 0, corr, con, rt]) #0 - eksperyment
+    if block_no != 1:
+        show_info(window, join('.', 'messages', 'break_mess.txt'))
+        core.wait(conf['TIME_FOR_REAST'])
+        window.flip()
+        show_info(window, join('.', 'messages', 'break_mess2.txt'))
+        while True:
+            reaction = event.getKeys(keyList='space')
+            if reaction:  # break if button was pressed
+                break
     window.flip()
-    core.wait(conf['TIME_FOR_REAST'])
-    show_info(window, join('.', 'messages', 'exp_mess.txt')) #trzeba dodać komunikat, że może kliknąć spacje
-# co? z tym 30s
-for _ in range():  # present stimuli
-    reaction = event.getKeys(keyList=list(conf['REACTION_KEYS']), timeStamped=clock)
-    if reaction:  # break if any button was pressed
-        break
-    window.flip()
+    # else:
+''' for i in range(conf['N_TRIALS_EXP']):
+            trial_no = i
+            run_trial(window, conf['N_TRIALS_EXP'])
+            corr, con, rt = run_trial(window, conf['N_TRIALS_EXP'])
+            conf['RESULTS'].append([ID, trial_no, 0, corr, con, rt]) #0 - eksperyment'''
+
 
 # THE END
 save_data()
