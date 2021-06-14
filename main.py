@@ -98,7 +98,9 @@ def run_trial(win, n_trials):
     elif stim_type == "right_incom":
         con = 0
 
-    return corr, con, rt
+    conf['RESULTS'].append([ID, trial_no, 0, corr, con, rt]) #0 - eksperyment
+
+    #return corr, con, rt
 
 
 
