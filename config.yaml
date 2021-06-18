@@ -7,6 +7,7 @@ N_TRIALS_EXP: 3 #ilość powtórzeń w bloku
 REACTION_KEYS: ['q', 'p']
 RESULTS: [["PART_ID", "TRIAL", "TRAINING", "CORRECT", "CONGRUENT","LATENCY"]]
 TIME_BREAK: 1
+TIME_MAX: 4
 TIME_FOR_REAST: 4 #czas pomiędzy blokami
 FIX_CROSS_TIME: 1  #czas miedzy + a bodźcem
 TEXT_TIME: 4

@@ -48,11 +48,11 @@ def save_data():
 
 
 def run_trial(win, n_trials):
-    global r, rt, con, corr, stim_type
+    global key, rt, con, corr, stim_type
 
     # LOSOWANIE BODZCA TAK, ZE NIE MA DWOCH TAKICH SAMYCH PO SOBIE
     previous_stim_type = ""
-    for i in range(n_trials):
+    for i in range(n_trials):                           #NIE DZIAŁA!
         stim_type = random.choice(list(stim.keys()))
         while stim_type == previous_stim_type:
             stim_type = random.choice(list(stim.keys()))
@@ -67,43 +67,53 @@ def run_trial(win, n_trials):
     event.clearEvents()
     win.callOnFlip(clock.reset)
 
+#PREZENTACJA BODZCA
     stim[stim_type].setAutoDraw(True)
     win.flip()
 
-    r = reactions(conf['REACTION_KEYS'])
+#CZEKANIE NA REAKCJE
+    key = "-"   #z góry key jest -, ale jak realcja to key zmienia się w p,q
+    key = reactions(conf['REACTION_KEYS'])
+
+    rt = "-"   # z góry rt jest -, ale jezeli
+    time_max = core.CountdownTimer(conf['TIME_MAX'])
+    while time_max.getTime() > 0:
+        rt = clock.getTime()
+
+'''r = reactions(conf['REACTION_KEYS'])
     while True:
         if r:  # break if any button was pressed
             rt = clock.getTime()
-            break
+            break'''
+
 
     stim[stim_type].setAutoDraw(False)
     fix.setAutoDraw(False)
     win.flip()
+
+    #PRZERWA POMIĘDZY TRIALAMI
     core.wait(conf['STIM_BREAK'])
     # core.wait(random.randrange((conf['STIM_BREAK'])))
 
-    key = r
+
     # corr = poprawnosc
-    if stim_type == "left_com" and key == "q":
+    if (stim_type == "left_com" and key == "q") or (stim_type == "left_incom" and key == "q") or \
+            ("right_com" == stim_type and key == "p") or (stim_type == "right_incom" and key == "p"):
         corr = 1
-    elif stim_type == "left_incom" and key == "q":
-        corr = 1
-    elif stim_type == "right_com" and key == "p":
-        corr = 1
-    elif stim_type == "right_incom" and key == "p":
-        corr = 1
-    else:
+    elif (stim_type == "left_com" and key == "p") or (stim_type == "left_incom" and key == "p") or \
+        (stim_type == "right_com" and key == "q") or (stim_type == "right_incom" and key == "q"):
         corr = 0
+    else:
+        corr = "-"
 
     # con = zgodnosc
-    if stim_type == "left_com":
+    if stim_type == "left_com" or stim_type == "right_com":
         con = 1
-    elif stim_type == "right_com":
-        con = 1
-    elif stim_type == "left_incom":
+    elif (stim_type == "left_incom") or stim_type == "right_incom":
         con = 0
-    elif stim_type == "right_incom":
-        con = 0
+    else:
+        con = "-"
+
     RESULTS.append([ID, trial_no, train, corr, con, rt])
 
 
@@ -114,7 +124,7 @@ clock = core.Clock()
 conf = yaml.load(open('config.yaml', encoding='utf-8'))
 
 # VISUAL SETTINGS FOR DIALOG BOX
-window = visual.Window(units="pix", color=conf['BACKGROUND_COLOR'], fullscr=False, size=(1500, 1500))
+window = visual.Window(units="pix", color=conf['BACKGROUND_COLOR'], fullscr=False, size=(4000, 4000))
 window.setMouseVisible(True)
 
 # DIALOG BOX
@@ -127,7 +137,7 @@ if not dlg.OK:
 ID = info['ID'] + info['PLEC'] + info['WIEK']
 datafile = '{}.csv'.format(ID)
 
-window = visual.Window(units="pix", color=conf['BACKGROUND_COLOR'], fullscr=False, size=(1500, 1500))
+window = visual.Window(units="pix", color=conf['BACKGROUND_COLOR'], fullscr=True, size=(1500, 1500))
 window.setMouseVisible(False)
 
 # stymulusy
