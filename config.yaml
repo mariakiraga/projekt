@@ -4,7 +4,7 @@ NO_BLOCK_TRAIN: 1  #ilość bloków tren.
 NO_BLOCK_EXP: 2 #ilość bloków eksp.
 FRAME_RATE: 60 #???
 N_TRIALS_TRAIN: 2
-N_TRIALS_EXP: 1 #ilość powtórzeń w bloku
+N_TRIALS_EXP: 3 #ilość powtórzeń w bloku
 REACTION_KEYS: ["space", 'q', 'p']
 RESULTS: [["PART_ID", "TRIAL", "TRAINING", "CORRECT", "CONGRUENT","LATENCY"]]
 TIME_BREAK: 1

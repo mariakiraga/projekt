@@ -139,8 +139,22 @@ stim = dict(left_com=visual.TextStim(win=window, text="LEWO", height=conf['STIM_
                                       color=conf['STIM_COLOR'], pos=(500.0, 0.0)),
             right_incom=visual.TextStim(win=window, text="PRAWO", height=conf['STIM_SIZE'],
                                         color=conf['STIM_COLOR'], pos=(-500.0, 0.0)))
-'''  
-# === Experiment part 1 ===
+
+show_info(window, join('.', 'messages', 'instr.txt'))
+# training
+show_info(window, join('.', 'messages', 'train_mess.txt'))
+
+for block_no in range(conf['NO_BLOCK_TRAIN']):
+    for a in range(conf['N_TRIALS_TRAIN']):
+        trial_no = a
+        trial_no += 1
+        run_trial(window, conf['N_TRIALS_TRAIN'])
+        #corr, con, rt = run_trial(window, conf['N_TRIALS_TRAIN'])
+        #RESULTS.append([ID, block_no, trial_no, 1, corr, con, rt])  # 1-trening
+
+    window.flip()
+
+'''# === Experiment part 1 ===
 '''
 show_info(window, join('.', 'messages', 'exp_mess.txt'))
 
