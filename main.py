@@ -12,6 +12,7 @@ def reactions(keys):
     key = event.waitKeys(keyList=keys)
     return key[0]
 
+
 def read_text_from_file(file_name, insert=''):
     msg = list()
     with codecs.open(file_name, encoding='utf-8', mode='r') as data_file:
@@ -27,22 +28,29 @@ def read_text_from_file(file_name, insert=''):
 
 def show_info(win, file_name, insert=''):
     msg = read_text_from_file(file_name, insert=insert)
-    msg = visual.TextStim(win, color='black', text=msg,
-                          height=40)
+    msg = visual.TextStim(win, color=conf['TEXT_COLOR'], text=msg, height=conf['TEXT_SIZE'])
     msg.draw()
     win.flip()
-    event.waitKeys(keyList='space')
+    event.waitKeys(keyList='space', timeStamped=clock)
+
+
+def show_info_br(win, file_name, insert=''):
+    msg = read_text_from_file(file_name, insert=insert)
+    msg = visual.TextStim(win, color=conf['TEXT_COLOR'], text=msg, height=conf['TEXT_SIZE'])
+    msg.draw()
+    win.flip()
 
 
 def save_data():
     with open(join('results', datafile), "w", newline='') as df:
         write = csv.writer(df)
-        write.writerows(conf['RESULTS'])
+        write.writerows(RESULTS)
 
 
 def run_trial(win, n_trials):
-    global r, rt, con
+    global r, rt, con, corr, stim_type
 
+    # LOSOWANIE BODZCA TAK, ZE NIE MA DWOCH TAKICH SAMYCH PO SOBIE
     previous_stim_type = ""
     for i in range(n_trials):
         stim_type = random.choice(list(stim.keys()))
@@ -50,13 +58,12 @@ def run_trial(win, n_trials):
             stim_type = random.choice(list(stim.keys()))
             previous_stim_type = stim_type
 
-        #fix point
+        # fix point
     fix.setAutoDraw(True)
     win.flip()
-    core.wait(conf['FIX_CROSS_TIME']) #wyświetlanie samego punktu fiksacji
+    core.wait(conf['FIX_CROSS_TIME'])  # wyświetlanie samego punktu fiksacji
 
-
-        # === Start trial ===
+    # === Start trial ===
     event.clearEvents()
     win.callOnFlip(clock.reset)
 
@@ -72,8 +79,8 @@ def run_trial(win, n_trials):
     stim[stim_type].setAutoDraw(False)
     fix.setAutoDraw(False)
     win.flip()
-    core.wait(1)
-        #core.wait(random.randrange(conf['STIM_BREAK']))
+    core.wait(conf['STIM_BREAK'])
+    # core.wait(random.randrange((conf['STIM_BREAK'])))
 
     key = r
     # corr = poprawnosc
@@ -83,7 +90,7 @@ def run_trial(win, n_trials):
         corr = 1
     elif stim_type == "right_com" and key == "p":
         corr = 1
-    elif stim_type == "right_com" and key == "p":
+    elif stim_type == "right_incom" and key == "p":
         corr = 1
     else:
         corr = 0
@@ -97,19 +104,14 @@ def run_trial(win, n_trials):
         con = 0
     elif stim_type == "right_incom":
         con = 0
-
-    conf['RESULTS'].append([ID, trial_no, 0, corr, con, rt]) #0 - eksperyment
-
-    #return corr, con, rt
+    RESULTS.append([ID, trial_no, train, corr, con, rt])
 
 
-
-#main
+# main
 clock = core.Clock()
 
 # load config, all params are their
-conf=yaml.load(open('config.yaml', encoding='utf-8'))
-
+conf = yaml.load(open('config.yaml', encoding='utf-8'))
 
 # VISUAL SETTINGS FOR DIALOG BOX
 window = visual.Window(units="pix", color=conf['BACKGROUND_COLOR'], fullscr=False, size=(1500, 1500))
@@ -123,12 +125,12 @@ if not dlg.OK:
     core.quit()
 
 ID = info['ID'] + info['PLEC'] + info['WIEK']
-datafile = 'ID.csv'
+datafile = '{}.csv'.format(ID)
 
 window = visual.Window(units="pix", color=conf['BACKGROUND_COLOR'], fullscr=False, size=(1500, 1500))
 window.setMouseVisible(False)
 
- #stymulusy
+# stymulusy
 fix = visual.TextStim(win=window, text="+", color=conf['FIX_CROSS_COLOR'], height=conf['FIX_CROSS_SIZE'])
 
 stim = dict(left_com=visual.TextStim(win=window, text="LEWO", height=conf['STIM_SIZE'],
@@ -144,43 +146,41 @@ show_info(window, join('.', 'messages', 'instr.txt'))
 # training
 show_info(window, join('.', 'messages', 'train_mess.txt'))
 
+RESULTS = [["PART_ID", "TRIAL", "TRAINING", "CORRECT", "CONGRUENT", "LATENCY"]]
+
 for block_no in range(conf['NO_BLOCK_TRAIN']):
     for a in range(conf['N_TRIALS_TRAIN']):
         trial_no = a
         trial_no += 1
+        train = 1
         run_trial(window, conf['N_TRIALS_TRAIN'])
-        #corr, con, rt = run_trial(window, conf['N_TRIALS_TRAIN'])
-        #RESULTS.append([ID, block_no, trial_no, 1, corr, con, rt])  # 1-trening
+        # corr, con, rt = run_trial(window, conf['N_TRIALS_TRAIN'])
+        # RESULTS.append([ID, trial_no, train, corr, con, rt])  # 1-trening
 
     window.flip()
 
-'''# === Experiment part 1 ===
-'''
+'''# === Experiment part 1 ==='''
+
 show_info(window, join('.', 'messages', 'exp_mess.txt'))
 
 for block_no in range(conf['NO_BLOCK_EXP']):
     for i in range(conf['N_TRIALS_EXP']):
         trial_no = i
+        train = 0
         run_trial(window, conf['N_TRIALS_EXP'])
-        #corr, con, rt = run_trial(window, conf['N_TRIALS_EXP'])
-        #conf['RESULTS'].append([ID, trial_no, 0, corr, con, rt]) #0 - eksperyment
-    if block_no != 1:
-        show_info(window, join('.', 'messages', 'break_mess.txt'))
-        core.wait(conf['TIME_FOR_REAST'])
-        window.flip()
-        show_info(window, join('.', 'messages', 'break_mess2.txt'))
-        while True:
-            reaction = event.getKeys(keyList='space')
-            if reaction:  # break if button was pressed
-                break
-    window.flip()
-    # else:
-''' for i in range(conf['N_TRIALS_EXP']):
-            trial_no = i
-            run_trial(window, conf['N_TRIALS_EXP'])
-            corr, con, rt = run_trial(window, conf['N_TRIALS_EXP'])
-            conf['RESULTS'].append([ID, trial_no, 0, corr, con, rt]) #0 - eksperyment'''
+        # corr, con, rt = run_trial(window, conf['N_TRIALS_EXP'])
+        # RESULTS.append([ID, trial_no, 0, corr, con, rt]) #0 - eksperyment
+    if block_no != conf['NO_BLOCK_EXP'] - 1:
 
+        #PO 0 SEK OD WYŚWIETLENIA BODZCA NIE MA REAKCJI NA KLIKNIĘTE KLAWICZE
+        event.waitKeys(maxWait=0)
+
+        #przez TIME_FOR_REAST POKAZUJE SIĘ INFO BEZ SPACJI
+        timer = core.CountdownTimer(conf['TIME_FOR_REAST'])
+        while timer.getTime() > 0:
+            show_info_br(window, join('.', 'messages', 'break_mess.txt'))
+        show_info(window, join('.', 'messages', 'break_mess2.txt'))
+        window.flip()
 
 # THE END
 save_data()
@@ -188,9 +188,4 @@ show_info(window, join('.', 'messages', 'fin_mess.txt'))
 window.close()
 core.quit()
 
-
-
-
-
-
-#co z errorem?
+# co z errorem?
