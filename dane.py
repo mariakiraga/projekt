@@ -39,8 +39,6 @@ def show_info(win, file_name, insert=''):
                           height=40)
     msg.draw()
     win.flip()
-    win.flip()
-
 
 def part_of_experiment(n_trials, train, fix, time):
     for i in range(n_trials):
@@ -92,9 +90,8 @@ age = info['WIEK']
 # ID = info['ID'] + info['PLEC'] + info['WIEK']
 
 datafile = '{}{}{}_data.csv'.format(info['ID'], info['PLEC'], info['WIEK'])
-
-
 # datafile = 'ID.csv'
+
 def save_data():
     with open(join('results', datafile), "w", newline='') as df:
         write = csv.writer(df)
