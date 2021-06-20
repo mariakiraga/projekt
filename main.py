@@ -72,19 +72,21 @@ def run_trial(win, n_trials):
     win.flip()
 
 #CZEKANIE NA REAKCJE
+    '''
     key = "-"   #z góry key jest -, ale jak realcja to key zmienia się w p,q
     key = reactions(conf['REACTION_KEYS'])
 
     rt = "-"   # z góry rt jest -, ale jezeli
     time_max = core.CountdownTimer(conf['TIME_MAX'])
     while time_max.getTime() > 0:
-        rt = clock.getTime()
+        rt = clock.getTime() '''
 
-'''r = reactions(conf['REACTION_KEYS'])
+    r = reactions(conf['REACTION_KEYS'])
     while True:
         if r:  # break if any button was pressed
             rt = clock.getTime()
-            break'''
+            break
+    key = r
 
 
     stim[stim_type].setAutoDraw(False)
