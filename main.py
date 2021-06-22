@@ -88,11 +88,13 @@ def run_trial(win, n_trials):
 
     # losowanie bod?ca tak, ?e nie ma dwóch takich samych po sobie
     previous_stim_type = ""
-    for i in range(n_trials):                           # NIE DZIA?A!
+    for i in range(n_trials):  # NIE DZIA?A!
         stim_type = random.choice(list(stim.keys()))
         while stim_type == previous_stim_type:
             stim_type = random.choice(list(stim.keys()))
+            print(stim_type)
             previous_stim_type = stim_type
+
 
     # fpunkt fiksacji
     fix.setAutoDraw(True)
@@ -123,7 +125,6 @@ def run_trial(win, n_trials):
             rt = clock.getTime()
             break
     key = r
-
 
     stim[stim_type].setAutoDraw(False)
     fix.setAutoDraw(False)
@@ -183,14 +184,14 @@ window.setMouseVisible(False)
 # bod?ce
 fix = visual.TextStim(win=window, text="+", color=conf['FIX_CROSS_COLOR'], height=conf['FIX_CROSS_SIZE'])
 
-stim = dict(left_com=visual.TextStim(win=window, text="LEWO", height=conf['STIM_SIZE'],
+stim = {"left_com":visual.TextStim(win=window, text="LEWO", height=conf['STIM_SIZE'],
                                      color=conf['STIM_COLOR'], pos=(-500.0, 0.0)),
-            left_incom=visual.TextStim(win=window, text="LEWO", height=conf['STIM_SIZE'],
+            "left_incom":visual.TextStim(win=window, text="LEWO", height=conf['STIM_SIZE'],
                                        color=conf['STIM_COLOR'], pos=(500.0, 0.0)),
-            right_com=visual.TextStim(win=window, text="PRAWO", height=conf['STIM_SIZE'],
+            "right_com":visual.TextStim(win=window, text="PRAWO", height=conf['STIM_SIZE'],
                                       color=conf['STIM_COLOR'], pos=(500.0, 0.0)),
-            right_incom=visual.TextStim(win=window, text="PRAWO", height=conf['STIM_SIZE'],
-                                        color=conf['STIM_COLOR'], pos=(-500.0, 0.0)))
+            "right_incom":visual.TextStim(win=window, text="PRAWO", height=conf['STIM_SIZE'],
+                                        color=conf['STIM_COLOR'], pos=(-500.0, 0.0))}
 
 # informacje o eksperymencie, instrukcje
 show_info(window, join('.', 'messages', 'instr.txt'))
