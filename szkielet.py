@@ -55,8 +55,7 @@ def check_exit(key=chr(27)): #sprawdzic czy dziala
     """
     stop = event.getKeys(keyList=[key])
     if stop:
-        abort_with_error(
-            'Experiment finished by user! Esc pressed.'.format(key))
+        raise Exception('Experiment finished by user! Esc pressed.')
 
 
 def show_info(win, file_name, insert=''):
