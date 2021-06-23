@@ -1,4 +1,4 @@
-
+#czas w sekundach
 BACKGROUND_COLOR: gray
 NO_BLOCK_TRAIN: 1  #ilość bloków tren.
 NO_BLOCK_EXP: 2 #ilość bloków eksp.
