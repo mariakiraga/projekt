@@ -9,7 +9,7 @@ import yaml
 from psychopy import visual, event, gui, core
 import atexit
 
-@atexit.register
+
 def reactions(keys):
     """
     Zbieranie informacji o przyci?ni?tym klawiszu.
@@ -20,19 +20,17 @@ def reactions(keys):
     key = event.waitKeys(keyList=keys)
     return key[0]
 
-def check_exit(key='Esc'): #sprawdzic czy dziala
+
+def abort(key=chr(27)): #sprawdzic czy dziala
     """
     Sprawdzic (w trakcie procedury) czy eksperymentator nie chce zakonczyc.
     """
-    stop = event.getKeys(keyList=[key])
-    if stop:
-        raise Exception('Experiment finished by user! Esc pressed.')
+    if key == [chr(27)]:
+       # raise Exception('Experiment finished by user! Esc pressed.')
+        save_data()
+        window.close()
+        core.quit()
 
-def abort_with_error(err):
-    """
-    Wywolaj jesli wystapil blad.
-    """
-    raise Exception(err)
 
 def read_text_from_file(file_name, insert=''):
     """
@@ -65,7 +63,18 @@ def show_info(win, file_name, insert=''):
     msg = visual.TextStim(win, color=conf['TEXT_COLOR'], text=msg, height=conf['TEXT_SIZE'])
     msg.draw()
     win.flip()
-    event.waitKeys(keyList='space', timeStamped=clock)
+    key = event.waitKeys(keyList=['space', chr(27)], timeStamped=clock)
+    if key == [chr(27)]:
+        abort_with_error(
+            'Experiment finished by user on info screen! Esc pressed.')
+    win.flip()
+
+
+def abort_with_error(err):
+    """
+    Wywolaj jesli wystapil blad.
+    """
+    raise Exception(err)
 
 
 def show_info_br(win, file_name, insert=''):
@@ -100,20 +109,20 @@ def run_trial(win, n_trials):
     :param n_trials: liczba powtórze?
     :return:
     """
-    global key, rt, con, corr, stim_type, previous_stim_type
+    global key, rt, con, corr, stim_type, prev_stim
 
-    # losowanie bod?ca tak, ?e nie ma dwóch takich samych po sobie
-    previous_stim_type = ""
-    for i in range(n_trials):  # NIE DZIA?A!
+#losowanie bod?ca tak, ?e nie ma dwóch takich samych po sobie
+
+
+
+    stim_type = random.choice(list(stim.keys()))
+    if stim_type == prev_stim:
         stim_type = random.choice(list(stim.keys()))
-        while stim_type == previous_stim_type:
-            stim_type = random.choice(list(stim.keys()))
-            print(stim_type)
-            previous_stim_type = stim_type
-        # previous_stim_type = stim_type
+    prev_stim = stim_type
 
 
-   # fpunkt fiksacji
+
+   # punkt fiksacji
     fix.setAutoDraw(True)
     win.flip()
     core.wait(conf['FIX_CROSS_TIME'])  # wy?wietlanie samego punktu fiksacji
@@ -136,12 +145,21 @@ def run_trial(win, n_trials):
     while time_max.getTime() > 0:
         rt = clock.getTime() '''
 
-    r = reactions(conf['REACTION_KEYS'])
-    while True:
-        if r:  # przerwij, gdy zostanie wci?ni?ty klawisz
+    while clock.getTime() <= conf['TIME_MAX']:
+        k = event.getKeys(conf['REACTION_KEYS'])
+        if k:
             rt = clock.getTime()
+
+            win.flip()
             break
-    key = r
+    key = k
+    print(key)
+    if clock.getTime() > conf['TIME_MAX']:
+        rt = '-'
+        win.flip()
+
+
+
 
     stim[stim_type].setAutoDraw(False)
     fix.setAutoDraw(False)
@@ -151,11 +169,11 @@ def run_trial(win, n_trials):
     core.wait(conf['STIM_BREAK'])
 
     # corr = poprawnosc
-    if (stim_type == "left_com" and key == "q") or (stim_type == "left_incom" and key == "q") or \
-            ("right_com" == stim_type and key == "p") or (stim_type == "right_incom" and key == "p"):
+    if (stim_type == "left_com" and key == ['q']) or (stim_type == "left_incom" and key == ['q']) or \
+            ("right_com" == stim_type and key == ['p']) or (stim_type == "right_incom" and key == ['p']):
         corr = 1
-    elif (stim_type == "left_com" and key == "p") or (stim_type == "left_incom" and key == "p") or \
-        (stim_type == "right_com" and key == "q") or (stim_type == "right_incom" and key == "q"):
+    elif (stim_type == "left_com" and key == ['p']) or (stim_type == "left_incom" and key == ['p']) or \
+        (stim_type == "right_com" and key == ['q']) or (stim_type == "right_incom" and key == ['q']):
         corr = 0
     else:
         corr = "-"
@@ -220,6 +238,9 @@ RESULTS = [["PART_ID", "TRIAL", "TRAINING", "CORRECT", "CONGRUENT", "LATENCY"]]
 
 for block_no in range(conf['NO_BLOCK_TRAIN']):
     for a in range(conf['N_TRIALS_TRAIN']):
+        if a == 0:
+            prev_stim = '0'
+        print(prev_stim)
         trial_no = a
         trial_no += 1
         train = 1
@@ -232,6 +253,9 @@ show_info(window, join('.', 'messages', 'exp_mess.txt'))
 
 for block_no in range(conf['NO_BLOCK_EXP']):
     for i in range(conf['N_TRIALS_EXP']):
+        if i == 0:
+            prev_stim = '0'
+        print(prev_stim)
         trial_no = i
         train = 0
         run_trial(window, conf['N_TRIALS_EXP'])
