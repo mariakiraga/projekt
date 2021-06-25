@@ -6,8 +6,9 @@ import csv
 from os.path import join
 import yaml
 from psychopy import visual, event, gui, core
+import atexit
 
-
+@atexit.register
 def reactions(keys):
     """
     Zbieranie informacji o przyci?ni?tym klawiszu.
@@ -18,6 +19,19 @@ def reactions(keys):
     key = event.waitKeys(keyList=keys)
     return key[0]
 
+def check_exit(key='Esc'): #sprawdzic czy dziala
+    """
+    Sprawdzic (w trakcie procedury) czy eksperymentator nie chce zakonczyc.
+    """
+    stop = event.getKeys(keyList=[key])
+    if stop:
+        raise Exception('Experiment finished by user! Esc pressed.')
+
+def abort_with_error(err):
+    """
+    Wywolaj jesli wystapil blad.
+    """
+    raise Exception(err)
 
 def read_text_from_file(file_name, insert=''):
     """
@@ -84,7 +98,7 @@ def run_trial(win, n_trials):
     :param n_trials: liczba powtórze?
     :return:
     """
-    global key, rt, con, corr, stim_type
+    global key, rt, con, corr, stim_type, previous_stim_type
 
     # losowanie bod?ca tak, ?e nie ma dwóch takich samych po sobie
     previous_stim_type = ""
@@ -94,9 +108,10 @@ def run_trial(win, n_trials):
             stim_type = random.choice(list(stim.keys()))
             print(stim_type)
             previous_stim_type = stim_type
+        # previous_stim_type = stim_type
 
 
-    # fpunkt fiksacji
+   # fpunkt fiksacji
     fix.setAutoDraw(True)
     win.flip()
     core.wait(conf['FIX_CROSS_TIME'])  # wy?wietlanie samego punktu fiksacji
