@@ -1,5 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: latin-1 -*-
+import atexit
 import codecs
 import random
 import csv
@@ -81,6 +82,7 @@ def show_info_br(win, file_name, insert=''):
     win.flip()
 
 
+@atexit.register
 def save_data():
     """
     Zapisywanie zebranych danych do pliku csv.
