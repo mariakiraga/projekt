@@ -220,6 +220,7 @@ for block_no in range(conf['NO_BLOCK_EXP']):
             prev_stim = '0'
         print(prev_stim)
         trial_no = i
+        trial_no += 1
         train = 0
         run_trial(window)
 
