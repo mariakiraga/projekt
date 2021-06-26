@@ -87,7 +87,7 @@ def run_trial(win,):
 
 #losowanie bod?ca tak, ?e nie ma dwóch takich samych po sobie
     stim_type = random.choice(list(stim.keys()))
-    if stim_type == prev_stim:
+    while stim_type == prev_stim:
         stim_type = random.choice(list(stim.keys()))
     prev_stim = stim_type
 
@@ -192,6 +192,7 @@ stim = {"left_com":visual.TextStim(win=window, text="LEWO", height=conf['STIM_SI
 
 # informacje o eksperymencie, instrukcje
 show_info(window, join('.', 'messages', 'instr.txt'))
+show_info(window, join('.', 'messages', 'instr2.txt'))
 
 # trening
 show_info(window, join('.', 'messages', 'train_mess.txt'))

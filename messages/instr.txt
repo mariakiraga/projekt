@@ -5,6 +5,7 @@ i klawisza q w przypadku pojawienia się słowa LEWO.
 
 Miejsce pojawienia się słowa nie ma znaczenia.
 
-Pamiętaj słowo PRAWO p, słowo LEWO q.
+
+
 
 Kliknij SPACJĘ, by kontynuować.
