@@ -10,28 +10,6 @@ from psychopy import visual, event, gui, core
 import atexit
 
 
-def reactions(keys):
-    """
-    Zbieranie informacji o przyci?ni?tym klawiszu.
-    :param keys: klawisz
-    :return: przyci?ni?ty klawisz
-    """
-    event.clearEvents()
-    key = event.waitKeys(keyList=keys)
-    return key[0]
-
-
-def abort(key=chr(27)): #sprawdzic czy dziala
-    """
-    Sprawdzic (w trakcie procedury) czy eksperymentator nie chce zakonczyc.
-    """
-    if key == [chr(27)]:
-       # raise Exception('Experiment finished by user! Esc pressed.')
-        save_data()
-        window.close()
-        core.quit()
-
-
 def read_text_from_file(file_name, insert=''):
     """
     Odczytywanie z pliku tekstowego i opcjonalnie dodawanie informacji generowanych dynamicznie.
@@ -63,18 +41,11 @@ def show_info(win, file_name, insert=''):
     msg = visual.TextStim(win, color=conf['TEXT_COLOR'], text=msg, height=conf['TEXT_SIZE'])
     msg.draw()
     win.flip()
-    key = event.waitKeys(keyList=['space', chr(27)], timeStamped=clock)
-    if key == [chr(27)]:
-        abort_with_error(
-            'Experiment finished by user on info screen! Esc pressed.')
+    key = event.waitKeys(keyList=['g', 'space'])
+    if key == ['g']:
+        win.close()
+        core.quit()
     win.flip()
-
-
-def abort_with_error(err):
-    """
-    Wywolaj jesli wystapil blad.
-    """
-    raise Exception(err)
 
 
 def show_info_br(win, file_name, insert=''):
@@ -89,9 +60,12 @@ def show_info_br(win, file_name, insert=''):
     msg = visual.TextStim(win, color=conf['TEXT_COLOR'], text=msg, height=conf['TEXT_SIZE'])
     msg.draw()
     win.flip()
+    key = event.getKeys(keyList=['g'])
+    if key == ['g']:
+        win.close()
+        core.quit()
 
 
-@atexit.register
 def save_data():
     """
     Zapisywanie zebranych danych do pliku csv.
@@ -102,7 +76,7 @@ def save_data():
         write.writerows(RESULTS)
 
 
-def run_trial(win, n_trials):
+def run_trial(win,):
     """
     Opis jednego trialu.
     :param win:
@@ -112,15 +86,10 @@ def run_trial(win, n_trials):
     global key, rt, con, corr, stim_type, prev_stim
 
 #losowanie bod?ca tak, ?e nie ma dwóch takich samych po sobie
-
-
-
     stim_type = random.choice(list(stim.keys()))
     if stim_type == prev_stim:
         stim_type = random.choice(list(stim.keys()))
     prev_stim = stim_type
-
-
 
    # punkt fiksacji
     fix.setAutoDraw(True)
@@ -136,29 +105,22 @@ def run_trial(win, n_trials):
     win.flip()
 
     # czekanie na reakcj?
-    '''
-    key = "-"   #z góry key jest -, ale jak realcja to key zmienia si? w p,q
-    key = reactions(conf['REACTION_KEYS'])
-
-    rt = "-"   # z góry rt jest -, ale jezeli
-    time_max = core.CountdownTimer(conf['TIME_MAX'])
-    while time_max.getTime() > 0:
-        rt = clock.getTime() '''
-
     while clock.getTime() <= conf['TIME_MAX']:
         k = event.getKeys(conf['REACTION_KEYS'])
-        if k:
+        if k == ['q'] or k == ['p']:
             rt = clock.getTime()
-
             win.flip()
             break
+        if k == ['g']:
+            win.close()
+            core.quit()
+        win.flip()
+
     key = k
     print(key)
     if clock.getTime() > conf['TIME_MAX']:
         rt = '-'
         win.flip()
-
-
 
 
     stim[stim_type].setAutoDraw(False)
@@ -244,7 +206,7 @@ for block_no in range(conf['NO_BLOCK_TRAIN']):
         trial_no = a
         trial_no += 1
         train = 1
-        run_trial(window, conf['N_TRIALS_TRAIN'])
+        run_trial(window)
 
     window.flip()
 
@@ -258,7 +220,7 @@ for block_no in range(conf['NO_BLOCK_EXP']):
         print(prev_stim)
         trial_no = i
         train = 0
-        run_trial(window, conf['N_TRIALS_EXP'])
+        run_trial(window)
 
     if block_no != conf['NO_BLOCK_EXP'] - 1:
 
@@ -272,7 +234,7 @@ for block_no in range(conf['NO_BLOCK_EXP']):
         show_info(window, join('.', 'messages', 'break_mess2.txt'))
         window.flip()
 
-# zako?czenie
+# zakonczenie
 save_data()
 show_info(window, join('.', 'messages', 'fin_mess.txt'))
 window.close()
