@@ -108,17 +108,15 @@ def run_trial(win):
         k = event.getKeys(conf['REACTION_KEYS'])
         if k == ['q'] or k == ['p']:
             rt = clock.getTime()
-            #win.flip()
             break
         if k == ['g']:
             win.close()
             core.quit()
-        #win.flip()
+
 
     key = k
     if clock.getTime() > conf['TIME_MAX']:
         rt = '-'
-        #win.flip()
 
 
     stim[stim_type].setAutoDraw(False)
