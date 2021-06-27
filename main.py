@@ -31,7 +31,7 @@ def read_text_from_file(file_name, insert=''):
 
 def show_info(win, file_name, insert=''):
     """
-    Wy?wietlanie odczytanej wiadomo?ci. Z mo?liwo?ci? przej?cia dalej SPACJ?.
+    Wyswietlanie odczytanej wiadomosci. Z mozliwoscia przejscia dalej SPACJA.
     :param win:
     :param file_name:
     :param insert:
@@ -50,7 +50,7 @@ def show_info(win, file_name, insert=''):
 
 def show_info_br(win, file_name, insert=''):
     """
-    Wy?wietlanie odczytanej wiadomo?ci. Bez mo?liwo?ci przej?cia dalej SPACJ?.
+    Wyswietlanie odczytanej wiadomosci. Bez mozliwosci przejscia dalej SPACJA.
     :param win:
     :param file_name:
     :param insert:
@@ -80,12 +80,12 @@ def run_trial(win,):
     """
     Opis jednego trialu.
     :param win:
-    :param n_trials: liczba powtórze?
+    :param n_trials: liczba powtórzen
     :return:
     """
     global key, rt, con, corr, stim_type, prev_stim
 
-#losowanie bod?ca tak, ?e nie ma dwóch takich samych po sobie
+#losowanie bodzca tak, ze nie ma dwóch takich samych po sobie
     stim_type = random.choice(list(stim.keys()))
     while stim_type == prev_stim:
         stim_type = random.choice(list(stim.keys()))
@@ -94,17 +94,17 @@ def run_trial(win,):
    # punkt fiksacji
     fix.setAutoDraw(True)
     win.flip()
-    core.wait(conf['FIX_CROSS_TIME'])  # wy?wietlanie samego punktu fiksacji
+    core.wait(conf['FIX_CROSS_TIME'])  # wyswietlanie samego punktu fiksacji
 
-    # rozpocz?cie trialu
+    # rozpoczecie trialu
     event.clearEvents()
     win.callOnFlip(clock.reset)
 
-    # prezentacja bod?ca
+    # prezentacja bodzca
     stim[stim_type].setAutoDraw(True)
     win.flip()
 
-    # czekanie na reakcj?
+    # czekanie na reakcje
     while clock.getTime() <= conf['TIME_MAX']:
         k = event.getKeys(conf['REACTION_KEYS'])
         if k == ['q'] or k == ['p']:
@@ -127,7 +127,7 @@ def run_trial(win,):
     fix.setAutoDraw(False)
     win.flip()
 
-    # przerwa pomi?dzy trialami
+    # przerwa pomiedzy trialami
     core.wait(conf['STIM_BREAK'])
 
     # corr = poprawnosc
@@ -154,7 +154,7 @@ def run_trial(win,):
 # main
 clock = core.Clock()
 
-# za?adowanie pliku config z parametrami
+# zaladowanie pliku config z parametrami
 conf = yaml.load(open('config.yaml', encoding='utf-8'))
 
 # ustawienia wizualne dla okna dialogowego
@@ -168,7 +168,7 @@ if not dlg.OK:
     print("User exited")
     core.quit()
 
-# Ogólne ID badanych z?o?one z informacji podanych w oknie dialogowym
+# Ogólne ID badanych zlozone z informacji podanych w oknie dialogowym
 ID = info['ID'] + info['PLEC'] + info['WIEK']
 
 # nazwa pliku csv z wynikami badanego
@@ -178,7 +178,7 @@ datafile = '{}.csv'.format(ID)
 window = visual.Window(units="pix", color=conf['BACKGROUND_COLOR'], fullscr=True, size=(1500, 1500))
 window.setMouseVisible(False)
 
-# bod?ce
+# bodzce
 fix = visual.TextStim(win=window, text="+", color=conf['FIX_CROSS_COLOR'], height=conf['FIX_CROSS_SIZE'])
 
 stim = {"left_com":visual.TextStim(win=window, text="LEWO", height=conf['STIM_SIZE'],
@@ -226,10 +226,10 @@ for block_no in range(conf['NO_BLOCK_EXP']):
 
     if block_no != conf['NO_BLOCK_EXP'] - 1:
 
-        # PO 0 SEK OD WY?WIETLENIA BODZCA NIE MA REAKCJI NA KLIKNI?TE KLAWICZE
+        # PO 0 SEK OD WYSWIETLENIA BODZCA NIE MA REAKCJI NA KLIKNIETE KLAWISZE
         event.waitKeys(maxWait=0)
 
-        # przez TIME_FOR_REAST POKAZUJE SI? INFO BEZ SPACJI
+        # przez TIME_FOR_REAST POKAZUJE SIE INFO BEZ SPACJI
         timer = core.CountdownTimer(conf['TIME_FOR_REAST'])
         while timer.getTime() > 0:
             show_info_br(window, join('.', 'messages', 'break_mess.txt'))
