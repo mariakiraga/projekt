@@ -226,10 +226,10 @@ for block_no in range(conf['NO_BLOCK_EXP']):
 
     if block_no != conf['NO_BLOCK_EXP'] - 1:
 
-        # PO 0 SEK OD WYSWIETLENIA BODZCA NIE MA REAKCJI NA KLIKNIETE KLAWISZE
+        # po 0 sek od wyswietlenia bodzca nie ma reakcji na klikniecie klawisze
         event.waitKeys(maxWait=0)
 
-        # przez TIME_FOR_REAST POKAZUJE SIE INFO BEZ SPACJI
+        # przez TIME_FOR_REAST pakazuje sie info bez spacji
         timer = core.CountdownTimer(conf['TIME_FOR_REAST'])
         while timer.getTime() > 0:
             show_info_br(window, join('.', 'messages', 'break_mess.txt'))
